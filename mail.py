@@ -6,8 +6,9 @@ import cache
 import messageinfo
 import stringscanner
 
-MAILBOX_GMAIL_ALL_MAIL = "[Gmail]/All Mail"
-MAILBOX_GMAIL_PREFIX = "[Gmail]"
+MAILBOX_GMAIL_ALL_MAIL = ""
+MAILBOX_GMAIL_PREFIX = "/"
+IGNORED_MAILBOXES = ['Contacts','Chats','Emailed Contacts','Notes','Trash']
 
 class Mail(object):
   def __init__(self, server, use_ssl, username, password, 
@@ -52,7 +53,9 @@ class Mail(object):
       
       if not "\\Noselect" in attributes and \
           name.find(MAILBOX_GMAIL_PREFIX) != 0:
-        mailboxes.append(name)
+        if not name in IGNORED_MAILBOXES:
+          logging.info(name)
+          mailboxes.append(name)
     
     return mailboxes
   
@@ -61,7 +64,10 @@ class Mail(object):
 
   def SelectMailbox(self, mailbox):
     logging.info("Selecting mailbox '%s'", mailbox)
-    r, data = self.__mail.select(mailbox)
+    if len(mailbox) == 0:
+      r, data = self.__mail.select()
+    else:
+      r, data = self.__mail.select(mailbox)
     self.__AssertOk(r)
     
     self.__current_mailbox = mailbox

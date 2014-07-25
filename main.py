@@ -54,27 +54,16 @@ def GetMessageInfos(opts):
   m.SelectAllMail()
   
   message_infos = m.GetMessageInfos()
+  for mi in message_infos:
+    mi.AddMailbox('INBOX')
   
-  # Then for each mailbox, see which messages are in it, and attach that to 
-  # the mail info
-  if "skip_labels" not in opts:
-    message_infos_by_id = \
-        dict([(mi.GetMessageId(), mi) for mi in message_infos])
-    
-    # Don't want to parse all these dates, since we already have them from the
-    # message infos above.
-    messageinfo.MessageInfo.SetParseDate(False)
-    
-    for mailbox in m.GetMailboxes():
-      m.SelectMailbox(mailbox)
-      message_ids = m.GetMessageIds()
-      for mid in message_ids:
-        if mid in message_infos_by_id:
-          message_info = message_infos_by_id[mid]
-          message_info.AddMailbox(mailbox)
-  
-    messageinfo.MessageInfo.SetParseDate(True)
-
+  for mailbox in m.GetMailboxes():
+    m.SelectMailbox(mailbox)
+    message_ids = m.GetMessageInfos()
+    for mid in message_ids:
+        mid.AddMailbox(mailbox)
+    message_infos += message_ids
+      
   m.Logout()
   
   # Filter out those that we're not interested in
