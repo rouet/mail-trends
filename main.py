@@ -239,6 +239,8 @@ opts = GetOptsMap()
 
 message_infos = GetMessageInfos(opts)
 
+logging.info("Analysing %d messages" % len(message_infos))
+
 logging.info("Extracting threads")
 threads = ExtractThreads(message_infos)
 
